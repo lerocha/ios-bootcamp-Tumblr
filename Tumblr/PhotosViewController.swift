@@ -75,5 +75,22 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         
         return cell
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // get the index path of the sender
+        let indexPath = tableView.indexPath(for: sender as! UITableViewCell)
+        // get the photo cell from indexPath
+        let cell = tableView.cellForRow(at: indexPath!) as! PhotoCell
+        
+        // get the detail view controller
+        let detailViewController = segue.destination as! PhotoDetailsViewController
+        // set the image in the detail view controller from the cell image
+        detailViewController.image = cell.photoImageView.image
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // get rid of the gray selection by deselecting the cell with animation
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
 }
 
