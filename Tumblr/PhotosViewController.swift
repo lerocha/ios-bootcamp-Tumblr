@@ -10,6 +10,8 @@ import UIKit
 
 class PhotosViewController: UIViewController {
     
+    var posts: [NSDictionary] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let apiKey = "Q6vHoaVm5L1u2ZAW1fqv3Jw48gFzYVg9P0vH0VHl3GVy6quoGV"
@@ -25,9 +27,9 @@ class PhotosViewController: UIViewController {
             if let data = dataOrNil {
                 if let responseDictionary = try! JSONSerialization.jsonObject(with: data, options:[]) as? NSDictionary {
                     
-                    let response = responseDictionary["response"] as? NSDictionary
-                    let posts = response?["posts"] as? [NSDictionary]
-                    NSLog("response: \(posts)")
+                    let response = responseDictionary["response"] as! NSDictionary
+                    self.posts = response["posts"] as! [NSDictionary]
+                    NSLog("response: \(self.posts)")
                 }
             }
         });
