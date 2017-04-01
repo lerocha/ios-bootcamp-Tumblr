@@ -7,13 +7,22 @@
 //
 
 import UIKit
+import AFNetworking
 
-class PhotosViewController: UIViewController {
+class PhotosViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    @IBOutlet weak var tableView: UITableView!
     
     var posts: [NSDictionary] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // configure data source and delegate
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.rowHeight = 240
+        
         let apiKey = "Q6vHoaVm5L1u2ZAW1fqv3Jw48gFzYVg9P0vH0VHl3GVy6quoGV"
         let url = URL(string:"https://api.tumblr.com/v2/blog/humansofnewyork.tumblr.com/posts/photo?api_key=\(apiKey)")
         let request = URLRequest(url: url!)
@@ -30,6 +39,8 @@ class PhotosViewController: UIViewController {
                     let response = responseDictionary["response"] as! NSDictionary
                     self.posts = response["posts"] as! [NSDictionary]
                     NSLog("response: \(self.posts)")
+                    
+                    self.tableView.reloadData()
                 }
             }
         });
@@ -40,7 +51,29 @@ class PhotosViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return posts.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PhotoCell") as! PhotoCell
 
-
+        // parse the data
+        let post = posts[indexPath.row] as NSDictionary
+        let title = post["slug"] as! String
+        
+        if let photos = post.value(forKeyPath: "photos") as? [NSDictionary] {
+            let imageUrlString = photos[0].value(forKeyPath: "original_size.url") as? String
+            if let imageUrl = URL(string: imageUrlString!) {
+                cell.photoImageView.setImageWith(imageUrl)
+            }
+        }
+        
+        // initialize the cell
+        cell.blogNameLabel.text = title
+        
+        return cell
+    }
 }
 
